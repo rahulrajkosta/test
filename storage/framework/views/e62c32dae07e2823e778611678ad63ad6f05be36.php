@@ -1,0 +1,1 @@
+<?php $report->render(); ?><?php /**PATH D:\after_emilocket_\makesecurepro\resources\views/report.blade.php ENDPATH**/ ?>

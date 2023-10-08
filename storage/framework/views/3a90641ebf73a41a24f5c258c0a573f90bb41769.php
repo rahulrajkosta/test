@@ -1,0 +1,143 @@
+<?php echo $__env->make('admin.common.header', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+
+<?php
+$BackUrl = CustomHelper::BackUrl();
+$routeName = CustomHelper::getAdminRouteName();
+
+$ADMIN_ROUTE_NAME = CustomHelper::getAdminRouteName();
+$storage = Storage::disk('public');
+$path = 'influencer/thumb/';
+// $roleId = Auth::guard('admin')->user()->role_id; 
+
+?>
+
+<div class="app-content content">
+  <div class="content-wrapper">
+    <div class="content-wrapper-before"></div>
+    <div class="content-header row">
+      <div class="content-header-left col-md-4 col-12 my-2">
+        <h3 class="content-header-title">Roles</h3>
+      </div>
+      <div class="content-header-right col-md-8 col-12 my-2">
+        <div class="breadcrumbs-top float-md-right">
+          <div class="breadcrumb-wrapper mr-1">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="<?php echo e(url('/admin')); ?>">Home</a>
+              </li>
+              <li class="breadcrumb-item active">Roles
+              </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="content-body">
+
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <h4 class="card-title">Roles</h4>
+              <a class="heading-elements-toggle"><i class="la la-ellipsis-v font-medium-3"></i></a>
+                <div class="heading-elements">
+                  <ul class="list-inline mb-0">
+                    <li>
+                    
+                     <!-- <a href="<?php echo e(route($ADMIN_ROUTE_NAME.'.roles.add').'?back_url='.$BackUrl); ?>" class="btn btn-info btn-sm" style='float: right;'>Add Roles</a> -->
+                   </li>
+                 </ul>
+               </div>
+            </div>
+            <div class="card-content collapse show">
+              <div class="table-responsive">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                     <th scope="col">#ID</th>
+                     <th scope="col">Name</th>
+                     <th scope="col">Parent</th>
+                     <th scope="col">Status</th>
+                     <th scope="col">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <?php if(!empty($roles)){
+
+                    $i = 1;
+                    foreach($roles as $role){
+                      ?>
+                      <tr>
+                        <td><?php echo e($i++); ?></td>
+                          <td><?php echo e($role->name??''); ?></td>
+                          <td><?php echo e(CustomHelper::getRoleName($role->parent_id)); ?></td>
+                          
+                        
+                        <td>
+                          <select id='change_role_status<?php echo e($role->id); ?>' onchange='change_role_status(<?php echo e($role->id); ?>)' class="form-control">
+                            <option value='1' <?php if($role->status ==1)echo "selected";?> >Active</option>
+                            <option value='0' <?php if($role->status ==0)echo "selected";?>>InActive</option>
+                          </select> 
+
+
+                        </td>
+                       
+
+                        <td>
+                         
+                          <!-- <a class="btn btn-success" href="<?php echo e(route($routeName.'.roles.edit', $role->id.'?back_url='.$BackUrl)); ?>"><i class="fa fa-edit"></i></a> -->
+
+                        </td>
+                      </tr>
+                    <?php }}?>
+           </tbody>
+                        <?php echo e($roles->appends(request()->input())->links('admin.pagination')); ?>
+
+                      </table>
+                   
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Responsive tables end -->
+        </div>
+      </div>
+    </div>
+    <!-- END: Content-->
+
+
+
+
+
+<?php echo $__env->make('admin.common.footer', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+
+<script>
+
+function change_role_status(role_id){
+  var status = $('#change_role_status'+role_id).val();
+
+
+   var _token = '<?php echo e(csrf_token()); ?>';
+
+            $.ajax({
+                url: "<?php echo e(route($routeName.'.roles.change_role_status')); ?>",
+                type: "POST",
+                data: {role_id:role_id, status:status},
+                dataType:"JSON",
+                headers:{'X-CSRF-TOKEN': _token},
+                cache: false,
+                success: function(resp){
+                    if(resp.success){
+                      alert(resp.message);
+                    }else{
+                      alert(resp.message);
+                      
+                    }
+                }
+            });
+
+
+}
+
+
+</script><?php /**PATH /var/www/html/makesecurepro/resources/views/admin/roles/index.blade.php ENDPATH**/ ?>

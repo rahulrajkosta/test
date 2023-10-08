@@ -1,0 +1,167 @@
+
+<?php
+echo View::make('admin/common/header');
+use koolreport\widgets\koolphp\Table;
+use koolreport\widgets\google\BarChart;
+?>
+<head>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/searchbuilder/1.5.0/css/searchBuilder.dataTables.min.css">
+
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/datetime/1.5.1/css/dataTables.dateTime.min.css">
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/searchbuilder/1.5.0/js/dataTables.searchBuilder.min.js"></script>
+<script src="https://cdn.datatables.net/datetime/1.5.1/js/dataTables.dateTime.min.js"></script>
+
+<style>
+    table-responsive {
+    display: block;
+    overflow-x: auto;
+    width: 98% !important;
+    -webkit-overflow-scrolling: touch;
+    margin: 0px auto;
+} 
+</style>
+</head>
+<div class="app-content content">
+<div class="content-wrapper">
+<div class="content-wrapper-before"></div>
+    <div class="content-header row">
+      <div class="content-header-left col-md-4 col-12 mb-2">
+        <h3 class="content-header-title">Zero Touch Details report from <?=$this->dataStore("zero_touch_data")->toArray()[0]['Dates'] ;?> to <?=$this->dataStore("zero_touch_data")->toArray()[count($this->dataStore("zero_touch_data")->toArray())-1]['Dates']; ?></h3>
+      </div>
+      <div class="content-header-right col-md-8 col-12">
+        <div class="breadcrumbs-top float-md-right">
+          <div class="breadcrumb-wrapper mr-1">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="{{url('/admin')}}">Home</a>
+              </li>
+              <li class="breadcrumb-item active">Reports
+              </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="content-body">
+
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <h4 class="card-title">Reports</h4>
+        <a class="heading-elements-toggle"><i class="la la-ellipsis-v font-medium-3"></i></a>
+        <div class="heading-elements">
+          <ul class="list-inline mb-0">
+            <li>
+
+             
+           </li>
+         </ul>
+       </div>
+     </div>
+     <div class="card-content collapse show">
+      <div class="table-responsive" style="display: block;
+    overflow-x: auto;
+    width: 98% !important;
+    -webkit-overflow-scrolling: touch;
+    margin: 0px auto;">
+      <!-- <tr>
+            <td>Minimum date:</td>
+            <td><input type="text" id="min" name="min"></td>
+        </tr>
+        <tr>
+            <td>Maximum date:</td>
+            <td><input type="text" id="max" name="max"></td>
+        </tr> -->
+        <?php
+
+        // echo "<pre>";
+        // print_r($this->dataStore("zero_touch_data")->toArray()[769]);
+        // die("===");
+        Table::create(array(
+            "dataStore" => $this->dataStore("zero_touch_data"),
+            "title" => "Closing Coupons",
+            "cssClass"=>array(
+                "table"=>"ttl"
+            )
+        ));
+        ?>
+       </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Responsive tables end -->
+</div>
+
+</div>
+</div>
+<?php echo View::make('admin/common/footer');?>
+<script>
+$(document).ready(function() {
+    var dt = $('.ttl').DataTable( {
+        dom: 'Qfrtip',
+        searchBuilder: {
+            conditions: {
+                "num":{
+                    // Overwrite the equals condition for the num type
+                    '+-5': {
+                        // This function decides whether to include the criteria in the search
+                        isInputValid: function (el, that) {
+                            let allFilled = true;
+ 
+                            // Check each element to make sure that the inputs are valid
+                            for (let element of el) {
+                                if ($(element).is('input') && $(element).val().length === 0) {
+                                    allFilled = false;
+                                }
+                            }
+ 
+                            return allFilled;
+                        },
+                        // This is the string displayed in the condition select
+                        conditionName: '+- 5',
+                        // This function gathers/sets the values from the dom elements created in the init function that are to be used for searching
+                        inputValue: function (el) {
+                            let values = [];
+ 
+                            // Go through the input elements and push each value to the return array
+                            for (let element of el) {
+                                if ($(element).is('input')) {
+                                    values.push($(element).val());
+                                }
+                            }
+ 
+                            return values;
+                        },
+                        // This function initialises the criteria, specifically any dom elements that are required for its use
+                        init: function(that, fn, preDefined = null) {
+                            // Declare the input element
+                            let el = $('<input/>')
+                                .addClass(that.classes.value)
+                                .addClass(that.classes.input)
+                                .on('input', function() { fn(that, this); });
+ 
+                            // If there is a preDefined value then add it
+                            if (preDefined !== null) {
+                                $(el).val(preDefined[0]);
+                            }
+ 
+                            return el;
+                        },
+                        // Straightforward search function comparing value from table and comparison from the input element
+                        // These values are retrieved in `inputValue`
+                        search: function (value, comparison) {
+                            return +value <= +comparison[0] + 5 && +value >= +comparison[0] - 5;
+                        }
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
